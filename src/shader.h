@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <vector>
 #include <string>
 
 typedef unsigned int ShaderId;
@@ -8,8 +9,7 @@ typedef unsigned int ShaderId;
 class Shader {
 public:
   // initializes a shader from GLSL source files
-  Shader(const char* vertex_path, const char* fragment_path);
-
+  Shader(const char* vertPath, const char* fragPath);
   // set as active shadser
   void use(void);
   // retrieve shader glfw id

@@ -1,19 +1,26 @@
-#include "model.h"
-
-#include "stb_image.h"
 
 // clang-format off
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 // clang-format on
 
+#include "model.h"
+#include "stb_image.h"
+
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 // Model class
-void Model::Draw(Shader shader) {
+void Model::draw(Shader shader) {
+  // Set the model matrix before rendering the model.
+  glm::mat4 model = glm::mat4(1.f);
+  model = glm::translate(model, pos);
+  model = glm::scale(model, scale);
+  shader.use();
+  shader.setMat4("model", model);
   for (int i = 0; i < this->meshes.size(); i++) {
     meshes[i].draw(shader);
   }
@@ -111,12 +118,10 @@ unsigned int TextureFromFile(const char* path, const std::string& directory) {
     glBindTexture(GL_TEXTURE_2D, texture_id);
     glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
-
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
     stbi_image_free(data);
   } else {
     std::cout << "Texture failed to load at path: " << filename << std::endl;

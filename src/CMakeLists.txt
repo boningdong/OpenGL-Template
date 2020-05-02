@@ -6,6 +6,8 @@ set(APPLICATION_SOURCE
   mesh.cpp
   model.cpp
   shader.cpp
+  lights.cpp
+  camera.cpp
 )
 
 # set executable output path
@@ -27,5 +29,6 @@ target_link_libraries(template
 target_include_directories(template PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # deinitions
-# target_compile_definitions(template PUBLIC SHADER_FOLDER="${CMAKE_CURRENT_SOURCE_DIR}/shaders")
-add_definitions(SHADER_FOLDER="${CMAKE_CURRENT_SOURCE_DIR}/shaders")
+target_compile_definitions(template PUBLIC SHADER_FOLDER="${CMAKE_CURRENT_SOURCE_DIR}/shaders/")
+target_compile_definitions(template PUBLIC MODEL_FOLDER="${CMAKE_CURRENT_SOURCE_DIR}/models/")
+
