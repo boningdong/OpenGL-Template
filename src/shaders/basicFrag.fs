@@ -11,40 +11,39 @@ struct PointLight {
   vec3 color;
 };
 
-uniform vec3 cam_position;
+uniform vec3 camera_position;
 uniform PointLight light;
 
 // Textures list
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_diffuse2;
-uniform sampler2D texture_diffuse3;
 uniform sampler2D texture_specular1;
 uniform sampler2D texture_specular2;
+uniform sampler2D texture_normal1;
+uniform sampler2D texture_normal2;
 
 void main() {
   // TODO: Make the light parameters setable.
-  vec3 lightPosition = vec3(0.f, 0.f, 0.f);
   // Light parameters
-  vec3 diffuse = vec3(1.0f, 1.0f, 1.0f);
-  vec3 ambient = vec3(0.2f, 0.2f, 0.2f);
-  vec3 specular = vec3(1.0f, 1.0f, 1.0f);
+  vec3 diffuse = light.color;
+  vec3 specular = light.color;
+  vec3 ambient = light.color * 0.1f;
 
   // Calculate directions
+  vec3 normal_texel = vec3(texture(texture_normal1, frag_texcoords));
   vec3 n = normalize(frag_normal);
-  vec3 l = normalize(lightPosition - frag_position);
-  vec3 v = normalize(cam_position - frag_position);
+  vec3 l = normalize(light.position - frag_position);
+  vec3 v = normalize(camera_position - frag_position);
   vec3 r = reflect(-l, n);
 
   // Calculate fragments
-  vec3 color = vec3(texture(texture_diffuse1, frag_texcoords));
-  // vec3 color = vec3(0.3f, 0.4f, 0.6f);
+  vec3 diffuse_texel = vec3(texture(texture_diffuse1, frag_texcoords));
+  vec3 specular_texel = vec3(texture(texture_specular1, frag_texcoords));
   float shine = pow(max(0, dot(r, v)), 32);
-  vec3 d = max(dot(n, l), 0) * diffuse * color;
-  vec3 a = ambient * color;
-  vec3 s = specular * shine * color;
+  vec3 d = max(dot(n, l), 0) * diffuse * diffuse_texel;
+  vec3 a = ambient * light.color;
+  vec3 s = specular * shine * specular_texel;
 
   // Output
   frag_color = vec4(d + a + s, 1.0f);
-  // frag_color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-
 }

@@ -24,5 +24,4 @@ public:
       : pos(pos), dir(dir), fov(fov) {
     aspect = width / height;
   }
-  void update(Shader &shader);
 };

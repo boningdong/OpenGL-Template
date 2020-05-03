@@ -7,7 +7,7 @@ set(APPLICATION_SOURCE
   model.cpp
   shader.cpp
   lights.cpp
-  camera.cpp
+  object.cpp
 )
 
 # set executable output path

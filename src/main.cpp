@@ -6,7 +6,7 @@
 
 // Global variables
 Camera camera = Camera(
-  glm::vec3(15.f, 15.f, 20.f), 
+  glm::vec3(3.f, 3.f, 5.f), 
   glm::vec3(-0.6f -0.3f -0.8f), 
   WINDOW_WIDTH, WINDOW_HEIGHT);
 
@@ -21,9 +21,9 @@ int main() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#ifdef __APPLE__
+  #ifdef __APPLE__
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
+  #endif
 
   // Create a windowed mode window and its OpenGL context
   GLFWwindow *window;
@@ -37,8 +37,6 @@ int main() {
 
   // Make the window's context current
   glfwMakeContextCurrent(window);
-  glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
-  glfwSetCursorPosCallback(window, cursorMoveCallback);
 
   // Initialize glad
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -46,36 +44,57 @@ int main() {
     exit(1);
   }
 
-  // glEnable(GL_DEPTH_TEST);
+  glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+  glfwSetCursorPosCallback(window, cursorMoveCallback);
+
+  glEnable(GL_DEPTH_TEST);
 
   // World components
   // NOTE: Load shader
   std::stringstream ssVertPath, ssFragPath;
   ssVertPath << SHADER_FOLDER << "basicVert.vs";
   ssFragPath << SHADER_FOLDER << "basicFrag.fs";
-  Shader shader = Shader(ssVertPath.str().c_str(), ssFragPath.str().c_str());
+  Shader basicShader = Shader(ssVertPath.str().c_str(), ssFragPath.str().c_str());
 
   // NOTE: Load model
   std::stringstream ssModelPath;
   ssModelPath << MODEL_FOLDER << "nanosuit/nanosuit.obj";
-  Model object = Model(ssModelPath.str().c_str());
+  Model msuit = Model(ssModelPath.str().c_str(), &basicShader);
+  
+  ssModelPath.str("");
+  ssModelPath << MODEL_FOLDER << "backpack/backpack.obj";
+  Model mbag = Model(ssModelPath.str().c_str(), &basicShader);
+
+  ssModelPath.str("");
+  ssModelPath << MODEL_FOLDER << "sponza/sponza.obj";
+  Model msponza = Model(ssModelPath.str().c_str(), &basicShader);
+
+  // NOTE: Create objects
+  Object character = Object(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.3f, 0.3f, 0.3f), &msuit);
+  Object sponza = Object(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.05f, 0.05f, 0.05f), &msponza);
+  Object bag = Object(glm::vec3(3.f, 1.f, 3.f), glm::vec3(1.f, 1.f, 1.f), &mbag);
+
+  // NOTE: Create light
+  PointLight light = PointLight(glm::vec3(-2.f, 10.f, 5.f), glm::vec3(1.0f, 1.0f, 1.0f), 1.f);
+  PointLight::enableRendering();
 
   // Main render loop
   while (!glfwWindowShouldClose(window)) {
     float t = glfwGetTime();
     dt = tt == 0 ? 0 : t - tt;
     tt = t;
-
     processUserInput(window);
 
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Render Start
     // NOTE: Set the view transport parameters
-    camera.update(shader);
     // NOTE: Start rendering
-    object.draw(shader);
+    light.draw(camera);
+    sponza.draw(camera, light);
+    character.draw(camera, light);
+    bag.draw(camera, light);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
@@ -110,6 +129,7 @@ void processUserInput(GLFWwindow *window) {
   }
 }
 
+// Callback functions
 void cursorMoveCallback(GLFWwindow* window, double xpos, double ypos) {
   static int xprev = xpos;
   static int yprev = ypos;

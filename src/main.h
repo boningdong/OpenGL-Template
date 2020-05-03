@@ -5,6 +5,8 @@
 #include "shader.h"
 #include "model.h"
 #include "camera.h"
+#include "object.h"
+#include "lights.h"
 #include <iostream>
 #include <string>
 #include <sstream>

@@ -2,29 +2,28 @@
 
 #include "mesh.h"
 #include "shader.h"
+#include "camera.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 #include <vector>
 
 class Model {
 public:
-  glm::vec3 pos;
-  glm::vec3 scale;
   std::vector<Texture> textures_loaded;
   std::vector<Mesh> meshes;
   std::string directory;
+  Shader *shader;
   Model() {}
-  Model(const char *path, glm::vec3 pos = glm::vec3(0.f, 0.f, 0.f),
-        glm::vec3 scale = glm::vec3(1.f, 1.f, 1.f))
-      : pos(pos), scale(scale) {
+  Model(const char *path, Shader* shader) : shader(shader) {
     std::cout << "Actual path: " << path << std::endl;
     loadModel(path);
   }
-  void draw(Shader shader);
+  void draw(glm::vec3 &pos, glm::vec3 &scale, Camera &camera);
 
 private:
   void loadModel(std::string path);
